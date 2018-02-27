@@ -33,7 +33,7 @@
  * As per the IETF draft this code is under the Simplified BSD License from
  * section 4.e at http://trustee.ietf.org/license-info/IETF-TLP-4.htm
  */
-int is_compliant(EC_POINT *pub_key, const EC_GROUP *group, BN_CTX *ctx)
+static int is_compliant(EC_POINT *pub_key, const EC_GROUP *group, BN_CTX *ctx)
 {
     /* We want the Q=(x,y) be a "compliant key" in terms of the
      * http://tools.ietf.org/html/draft-jivsov-ecc-compact,
