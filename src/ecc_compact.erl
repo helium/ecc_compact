@@ -40,7 +40,7 @@ init() ->
 %% restrictions.
 -spec generate_compliant_key() -> {ok, ecc_private_key(), ecc_coordinate()}.
 generate_compliant_key() ->
-    Key = public_key:generate_key({namedCurve,{1,2,840,10045,3,1,7}}),
+    Key = public_key:generate_key({namedCurve,?secp256r1}),
     #'ECPrivateKey'{parameters=_Params, publicKey=PubKey} = Key,
     case is_compact_nif(PubKey) of
         true ->
@@ -80,7 +80,9 @@ is_compact(<<4, X:32/binary, _Y:32/binary>> = PubKey) ->
             {true, X};
         false ->
             false
-    end.
+    end;
+is_compact(_) ->
+    erlang:error(badarg).
 
 
 % This is just a simple place holder. It mostly shouldn't ever be called
