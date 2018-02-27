@@ -1,0 +1,7 @@
+{application, ecc_compact, [
+    {description, "Check if a ECC key is 'compliant' with the compactness"},
+    {vsn, "0.0.1"},
+    {registered, []},
+    {applications, [kernel, stdlib]},
+    {env, []}
+]}.

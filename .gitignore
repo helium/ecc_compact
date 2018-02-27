@@ -1,0 +1,6 @@
+_build/
+priv/
+doc/
+.*.sw?
+c_src/*.d
+c_src/*.o
