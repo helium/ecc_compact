@@ -33,7 +33,8 @@
  * As per the IETF draft this code is under the Simplified BSD License from
  * section 4.e at http://trustee.ietf.org/license-info/IETF-TLP-4.htm
  */
-static int is_compliant(EC_POINT *pub_key, const EC_GROUP *group, BN_CTX *ctx)
+static int
+is_compliant(EC_POINT * pub_key, const EC_GROUP * group, BN_CTX * ctx)
 {
     /* We want the Q=(x,y) be a "compliant key" in terms of the
      * http://tools.ietf.org/html/draft-jivsov-ecc-compact,
@@ -43,37 +44,42 @@ static int is_compliant(EC_POINT *pub_key, const EC_GROUP *group, BN_CTX *ctx)
      * dropped because without any loss of security.
      * Given the x, we know that the y is a minimum of the two possibilities.
      */
-    const EC_METHOD *meth = EC_GROUP_method_of(group);
-    const int is_prime = (EC_METHOD_get_field_type(meth) == NID_X9_62_prime_field);
+    const EC_METHOD * meth     = EC_GROUP_method_of(group);
+    const int         is_prime = (EC_METHOD_get_field_type(meth) == NID_X9_62_prime_field);
 
-    if( is_prime )  {
+    if (is_prime)
+    {
         BIGNUM *ec_p, *ec_a, *ec_b, *ec_p_y, *ec_x, *ec_y;
 
-        ec_p = BN_CTX_get(ctx);
-        ec_a = BN_CTX_get(ctx);
-        ec_b = BN_CTX_get(ctx);
+        ec_p   = BN_CTX_get(ctx);
+        ec_a   = BN_CTX_get(ctx);
+        ec_b   = BN_CTX_get(ctx);
         ec_p_y = BN_CTX_get(ctx);
-        ec_x = BN_CTX_get(ctx);
-        ec_y = BN_CTX_get(ctx);
+        ec_x   = BN_CTX_get(ctx);
+        ec_y   = BN_CTX_get(ctx);
 
         if (ec_p == NULL || ec_a == NULL || ec_b == NULL || ec_p_y == NULL)
         {
             return -1;
         }
-        if (!EC_GROUP_get_curve_GFp(group, ec_p, ec_a, ec_b, NULL))  {
+        if (!EC_GROUP_get_curve_GFp(group, ec_p, ec_a, ec_b, NULL))
+        {
             return -1;
         }
-        if (!EC_POINT_get_affine_coordinates_GFp(group, pub_key, ec_x, ec_y, ctx))  {
+        if (!EC_POINT_get_affine_coordinates_GFp(group, pub_key, ec_x, ec_y, ctx))
+        {
             return -1;
         }
         BN_sub(ec_p_y, ec_p, ec_y);
 
-        if( BN_cmp(ec_p_y, ec_y) < 0  )  {
+        if (BN_cmp(ec_p_y, ec_y) < 0)
+        {
             return 1; /* false */
-        } else {
+        }
+        else
+        {
             return 0; /* true */
         }
     }
     return 1;
 }
-
