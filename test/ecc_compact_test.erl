@@ -46,3 +46,17 @@ wrong_curve_test() ->
             ?assert(true)
     end,
     ok.
+
+key_with_leading_zeros_in_y_coordinate_test() ->
+    Key = {'ECPrivateKey',1,
+           <<24,166,124,60,235,151,150,175,21,14,17,166,20,155,69,168,147,56,
+             174,143,138,64,60,78,4,101,129,96,135,46,205,204>>,
+           {namedCurve,{1,2,840,10045,3,1,7}},
+           <<4,216,67,1,187,4,120,72,243,120,252,76,68,11,155,208,244,56,
+             101,253,67,214,128,225,88,64,204,147,185,108,176,237,19,0,109,
+             55,36,142,111,190,1,48,190,235,92,27,234,62,176,156,121,37,71,
+             202,191,139,227,53,139,188,53,37,254,84,33>>},
+    #'ECPrivateKey'{parameters=_Params, publicKey=PubKey} = Key,
+    ECPubKey = {#'ECPoint'{point=PubKey}, {namedCurve, ?secp256r1}},
+    <<4, X:32/binary, _Y:32/binary>> = PubKey,
+    ?assertEqual(ECPubKey, ecc_compact:recover(X)).

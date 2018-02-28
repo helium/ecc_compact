@@ -46,12 +46,12 @@ generate_compliant_key() ->
         true ->
             %% ok, get the X/Y coordinates
             <<4, X:32/binary, Y:32/binary>> = PubKey,
-            case recover_nif(X) of
+            case recover_int(X) of
                 Y ->
                     {ok, Key, X};
                 Z ->
                     %% this should never happen, but blow up dramatically if it does
-                    erlang:error({key_recovery_failure, X, Y, Z})
+                    erlang:error({key_recovery_failure, Key, X, Y, Z})
             end;
         false ->
             generate_compliant_key()
@@ -61,9 +61,25 @@ generate_compliant_key() ->
 %% curve, return the public key.
 -spec recover(ecc_coordinate()) -> ecc_public_key().
 recover(X) when is_binary(X), byte_size(X) == 32 ->
-    Y = recover_nif(X),
+    Y = recover_int(X),
     {#'ECPoint'{point = <<4, X:32/binary, Y:32/binary>>}, {namedCurve,
                                                            ?secp256r1}}.
+
+-spec recover_int(ecc_coordinate()) -> ecc_coordinate().
+recover_int(X) ->
+    Y0 = recover_nif(X),
+    case byte_size(Y0) < 32 of
+        false ->
+            Y0;
+        true ->
+            %% Sometimes the Y coordinate has leading 0s in its big-endian
+            %% representation and thus the size of the bignum is less than
+            %% 32 bytes. This leads the corresponding binary to be less than
+            %% 32 bytes long and so we must pad it back up to 32 bytes
+            %% manually here.
+            Length = (32 - byte_size(Y0))*8,
+            <<0:Length/integer-unsigned, Y0/binary>>
+    end.
 
 %% @doc Returns whether a given key is compliant with the compactness
 %% restrictions. In the case that the key is compliant, also return the bare X
