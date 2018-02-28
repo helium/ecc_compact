@@ -58,14 +58,16 @@ term2point(ErlNifEnv * env, ERL_NIF_TERM term, EC_GROUP * group, EC_POINT ** ppt
 }
 
 static int
-get_bn_from_bin(ErlNifEnv * env, ERL_NIF_TERM term, BIGNUM ** bnp)
+get_bn_from_bin(ErlNifEnv * env, ERL_NIF_TERM term, BIGNUM * bnp)
 {
     ErlNifBinary bin;
     if (!enif_inspect_binary(env, term, &bin))
     {
         return 0;
     }
-    *bnp = BN_bin2bn(bin.data, bin.size, NULL);
+    if (NULL == BN_bin2bn(bin.data, bin.size, bnp)) {
+        return 0;
+    }
     return 1;
 }
 

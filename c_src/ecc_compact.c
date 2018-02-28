@@ -84,6 +84,7 @@ recover(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
     tmp1 = BN_CTX_get(ctx);
     tmp2 = BN_CTX_get(ctx);
     x    = BN_CTX_get(ctx);
+    x_   = BN_CTX_get(ctx);
     y    = BN_CTX_get(ctx);
     p_y  = BN_CTX_get(ctx);
     if (p_y == NULL)
@@ -112,7 +113,7 @@ recover(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
 
     const BIGNUM * field = BN_get0_nist_prime_256();
 
-    if (!get_bn_from_bin(env, argv[0], &x_))
+    if (!get_bn_from_bin(env, argv[0], x_))
     {
         ret = enif_make_badarg(env);
         goto err;
@@ -199,10 +200,6 @@ err:
     if (key)
     {
         EC_KEY_free(key);
-    }
-    if (x_)
-    {
-        BN_clear_free(x_);
     }
 
     return ret;
