@@ -297,7 +297,7 @@ load(ErlNifEnv * env, void ** priv_data, ERL_NIF_TERM load_info)
     (void)load_info;
     atom_undefined = enif_make_atom(env, "undefined");
     atom_enomem    = enif_make_atom(env, "enomem");
-    atom_enomem    = enif_make_atom(env, "enotsup");
+    atom_enotsup    = enif_make_atom(env, "enotsup");
     return 0;
 }
 
