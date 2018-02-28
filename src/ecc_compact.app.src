@@ -1,7 +1,12 @@
 {application, ecc_compact, [
     {description, "Check if a ECC key is 'compliant' with the compactness"},
-    {vsn, "0.0.1"},
+    {vsn, "git"},
     {registered, []},
     {applications, [kernel, stdlib]},
-    {env, []}
+    {env, []},
+
+  %% hex.pm packaging:
+  {licenses, ["Apache 2.0", "OpenSSL", "Simplified BSD"]},
+  {maintainers, ["Helium"]},
+  {links, [{"Github", "https://github.com/helium/ecc_compact"}]}
 ]}.
