@@ -12,6 +12,7 @@
 #include "ecc_compact_helpers.h"
 #include "ecc_compact_jivsov.h"
 #include "erl_nif.h"
+#include <stdint.h>
 #include <openssl/engine.h>
 #include <openssl/obj_mac.h>
 

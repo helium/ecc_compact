@@ -1,0 +1,9 @@
+sudo: false
+dist: trusty
+
+language: erlang
+
+otp_release:
+  - 20.1
+
+script: ./rebar3 as test do eunit, coveralls send, dialyzer
