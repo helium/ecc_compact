@@ -1,6 +1,6 @@
 
-%% @doc Utility module for checking while NIST P-256 (secp256r1) ECC keys can be
-%% compressed to only their X coordinate. This implementation implements the
+%% @doc Utility module for checking whether NIST P-256 (secp256r1) ECC keys can
+%% be compressed to only their X coordinate. This implementation implements the
 %% strategy described in
 %% [https://tools.ietf.org/html/draft-jivsov-ecc-compact-05] and is based on a
 %% 1986 publication by Victor Miller in 'CRYPTO 85'. This method is believed to

@@ -13,3 +13,8 @@ Building
 --------
 
 Simply use `make` to build the library.
+
+Limitations
+-----------
+
+This currently only supports NIST P-256 keys, other curves could be supported, but the work has not yet been done. Contributions welcome.
