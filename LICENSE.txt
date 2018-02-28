@@ -1,6 +1,0 @@
-This project is composed of code under several different licences.
-
-c_src/ecc_compact_jivsov.h is under the Simplified BSD License, included at the top of the file.
-c_src/ecc_compact.c is under the OpenSSL license, a copy of which can be found in LICENSE.openssl.txt
-
-All remaining files are under the Apache 2 license, a copy of which can be found in LICENSE.apache.txt
