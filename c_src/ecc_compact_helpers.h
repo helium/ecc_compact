@@ -74,6 +74,7 @@ get_bn_from_bin(ErlNifEnv * env, ERL_NIF_TERM term, BIGNUM * bnp)
 static ERL_NIF_TERM
 bin_from_bn(ErlNifEnv * env, const BIGNUM * bn)
 {
+    int             bn_len;
     unsigned char * bin_ptr;
     ERL_NIF_TERM    term;
 
