@@ -1,4 +1,3 @@
-
 %% @doc Utility module for checking whether NIST P-256 (secp256r1) ECC keys can
 %% be compressed to only their X coordinate. This implementation implements the
 %% strategy described in
@@ -9,7 +8,7 @@
 %% The implementation is done as a NIF linked against the system's libcrypto.
 
 -module(ecc_compact).
--export([is_compact/1, generate_compliant_key/0, recover/1]).
+-export([is_compact/1, generate_key/0, recover_key/1]).
 -on_load(init/0).
 
 -include_lib("public_key/include/public_key.hrl").
@@ -38,8 +37,8 @@ init() ->
 
 %% @doc Generate a NIST p-256 key that is compliant with the compactness
 %% restrictions.
--spec generate_compliant_key() -> {ok, ecc_private_key(), ecc_coordinate()}.
-generate_compliant_key() ->
+-spec generate_key() -> {ok, ecc_private_key(), ecc_coordinate()}.
+generate_key() ->
     Key = public_key:generate_key({namedCurve,?secp256r1}),
     #'ECPrivateKey'{parameters=_Params, publicKey=PubKey} = Key,
     case is_compact_nif(PubKey) of
@@ -54,13 +53,13 @@ generate_compliant_key() ->
                     erlang:error({key_recovery_failure, Key, X, Y, Z})
             end;
         false ->
-            generate_compliant_key()
+            generate_key()
     end.
 
 %% @doc Given the X coordinate of a public key from a compliant point on the
 %% curve, return the public key.
--spec recover(ecc_coordinate()) -> ecc_public_key().
-recover(X) when is_binary(X), byte_size(X) == 32 ->
+-spec recover_key(ecc_coordinate()) -> ecc_public_key().
+recover_key(X) when is_binary(X), byte_size(X) == 32 ->
     Y = recover_int(X),
     {#'ECPoint'{point = <<4, X:32/binary, Y:32/binary>>}, {namedCurve,
                                                            ?secp256r1}}.

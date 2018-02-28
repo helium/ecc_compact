@@ -17,16 +17,16 @@ ecc_noncompliant_test() ->
     ?assertNot(ecc_compact:is_compact(Key)),
     #'ECPrivateKey'{parameters=_Params, publicKey=PubKey} = Key,
     <<4, X:32/binary, _Y:32/binary>> = PubKey,
-    ?assertNotEqual({#'ECPoint'{point=PubKey}, {namedCurve, ?secp256r1}}, ecc_compact:recover(X)),
+    ?assertNotEqual({#'ECPoint'{point=PubKey}, {namedCurve, ?secp256r1}}, ecc_compact:recover_key(X)),
     ok.
 
 ecc_compliant_test() ->
-    {ok, Key, X} = ecc_compact:generate_compliant_key(),
+    {ok, Key, X} = ecc_compact:generate_key(),
     ?assertEqual({true, X}, ecc_compact:is_compact(Key)),
     #'ECPrivateKey'{parameters=_Params, publicKey=PubKey} = Key,
     <<4, X:32/binary, _Y:32/binary>> = PubKey,
     ECPubKey = {#'ECPoint'{point=PubKey}, {namedCurve, ?secp256r1}},
-    ?assertEqual(ECPubKey, ecc_compact:recover(X)),
+    ?assertEqual(ECPubKey, ecc_compact:recover_key(X)),
     ?assertEqual({true, X}, ecc_compact:is_compact(ECPubKey)),
     ok.
 
@@ -37,7 +37,7 @@ wrong_curve_test() ->
     #'ECPrivateKey'{parameters=_Params, publicKey=PubKey} = Key,
     ECPubKey = {#'ECPoint'{point=PubKey}, {namedCurve, ?secp256r1}},
     <<4, X:32/binary, _Y:32/binary>> = PubKey,
-    try ecc_compact:recover(X) of
+    try ecc_compact:recover_key(X) of
         Result ->
             %% point happens to somehow make sense, but it should not return a sane key
             ?assertNotEqual(ECPubKey, Result)
@@ -59,4 +59,4 @@ key_with_leading_zeros_in_y_coordinate_test() ->
     #'ECPrivateKey'{parameters=_Params, publicKey=PubKey} = Key,
     ECPubKey = {#'ECPoint'{point=PubKey}, {namedCurve, ?secp256r1}},
     <<4, X:32/binary, _Y:32/binary>> = PubKey,
-    ?assertEqual(ECPubKey, ecc_compact:recover(X)).
+    ?assertEqual(ECPubKey, ecc_compact:recover_key(X)).
