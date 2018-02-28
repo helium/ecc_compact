@@ -22,7 +22,8 @@ ifeq ($(UNAME_SYS), Darwin)
 	CPPFLAGS ?= -I/usr/local/opt/openssl/include
 	CFLAGS ?= -O3 -std=c99 -arch x86_64 -finline-functions -Wall -Wmissing-prototypes
 	CXXFLAGS ?= -O3 -arch x86_64 -finline-functions -Wall
-	LDFLAGS ?= -arch x86_64 -bundle -bundle_loader $(ERL_BEAM_SMP) -L/usr/local/opt/openssl/lib
+	LDFLAGS ?= -arch x86_64
+	LDFLAGS += -bundle -bundle_loader $(ERL_BEAM_SMP) -L/usr/local/opt/openssl/lib
 else ifeq ($(UNAME_SYS), FreeBSD)
 	CC ?= cc
 	CFLAGS ?= -O3 -std=c99 -finline-functions -Wall -Wmissing-prototypes

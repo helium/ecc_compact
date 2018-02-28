@@ -128,17 +128,17 @@ recover(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
     /* tmp1 := x^3 */
     if (!BN_nnmod(x, x_, field, ctx))
     {
-        ret = enif_raise_exception(env, atom_enomem);
+        ret = enif_raise_exception(env, atom_enotsup);
         goto err;
     }
     if (!BN_mod_sqr(tmp2, x_, field, ctx))
     {
-        ret = enif_raise_exception(env, atom_enomem);
+        ret = enif_raise_exception(env, atom_enotsup);
         goto err;
     }
     if (!BN_mod_mul(tmp1, tmp2, x_, field, ctx))
     {
-        ret = enif_raise_exception(env, atom_enomem);
+        ret = enif_raise_exception(env, atom_enotsup);
         goto err;
     }
 
@@ -146,30 +146,30 @@ recover(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
     /* we can take the shortcut because a is -3 */
     if (!BN_mod_lshift1_quick(tmp2, x, field))
     {
-        ret = enif_raise_exception(env, atom_enomem);
+        ret = enif_raise_exception(env, atom_enotsup);
         goto err;
     }
     if (!BN_mod_add_quick(tmp2, tmp2, x, field))
     {
-        ret = enif_raise_exception(env, atom_enomem);
+        ret = enif_raise_exception(env, atom_enotsup);
         goto err;
     }
     if (!BN_mod_sub_quick(tmp1, tmp1, tmp2, field))
     {
-        ret = enif_raise_exception(env, atom_enomem);
+        ret = enif_raise_exception(env, atom_enotsup);
         goto err;
     }
 
     /* tmp1 := tmp1 + b */
     if (!BN_mod_add_quick(tmp1, tmp1, curve_b, field))
     {
-        ret = enif_raise_exception(env, atom_enomem);
+        ret = enif_raise_exception(env, atom_enotsup);
         goto err;
     }
 
     if (!BN_mod_sqrt(y, tmp1, field, ctx))
     {
-        ret = enif_raise_exception(env, atom_enomem);
+        ret = enif_raise_exception(env, atom_enotsup);
         goto err;
     }
 
@@ -178,7 +178,7 @@ recover(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
     /* compute p - y */
     if (!BN_mod_sub_quick(p_y, curve_p, y, field))
     {
-        ret = enif_raise_exception(env, atom_enomem);
+        ret = enif_raise_exception(env, atom_enotsup);
         goto err;
     }
 
