@@ -77,8 +77,7 @@ bin_from_bn(ErlNifEnv * env, const BIGNUM * bn)
     ERL_NIF_TERM    term;
 
     /* Copy the bignum into an erlang binary. */
-    bn_len  = BN_num_bytes(bn);
-    bin_ptr = enif_make_new_binary(env, bn_len, &term);
+    bin_ptr = enif_make_new_binary(env, 32, &term);
     BN_bn2bin(bn, bin_ptr);
 
     return term;
