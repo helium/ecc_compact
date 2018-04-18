@@ -2,7 +2,11 @@
  [{description,"Patent-free ECC point compression for NIST P-256 keys."},
   {vsn,"git"},
   {registered,[]},
-  {applications,[kernel,stdlib]},
+  {applications,[
+                 kernel,
+                 stdlib,
+                 public_key
+                ]},
   {env,[]},
 
   %% hex.pm packaging:

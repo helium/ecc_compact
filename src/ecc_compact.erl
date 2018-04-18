@@ -22,7 +22,7 @@
 -type point() :: <<_:520>>.
 -type compact_key() :: coordinate().
 
--export_types([public_key/0, private_key/0, compact_key/0]).
+-export_type([public_key/0, private_key/0, compact_key/0]).
 
 init() ->
     SoName = case code:priv_dir(?APPNAME) of
