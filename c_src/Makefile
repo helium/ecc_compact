@@ -27,13 +27,15 @@ ifeq ($(UNAME_SYS), Darwin)
 else ifeq ($(UNAME_SYS), FreeBSD)
 	CC ?= cc
 	CFLAGS ?= -O3 -std=c99 -finline-functions -Wall -Wmissing-prototypes
-	CXXFLAGS ?= -O3 -finline-functions -Wall -lcrypto
+	CXXFLAGS ?= -O3 -finline-functions -Wall
 	LDFLAGS += -shared
+	LDLIBS += -lcrypto
 else ifeq ($(UNAME_SYS), Linux)
 	CC ?= gcc
 	CFLAGS ?= -O3 -std=c99 -finline-functions -Wall -Wmissing-prototypes
-	CXXFLAGS ?= -O3 -finline-functions -Wall -lcrypto
+	CXXFLAGS ?= -O3 -finline-functions -Wall
 	LDFLAGS += -shared
+	LDLIBS += -lcrypto
 endif
 
 CFLAGS += -fPIC -I$(ERTS_INCLUDE_DIR) -I$(ERL_INTERFACE_INCLUDE_DIR) -Wextra
@@ -76,3 +78,26 @@ $(C_SRC_OUTPUT): $(OBJECTS)
 
 clean:
 	@rm -f $(C_SRC_OUTPUT) $(OBJECTS)
+
+%.compdb_entry: %.c
+	@echo "    {" > $@
+	@echo "        \"command\": \"cc  $(CFLAGS) $(CPPFLAGS) -c $<\","   >> $@
+	@echo "        \"directory\": \"$(CURDIR)\","               >> $@
+	@echo "        \"file\": \"$<\""                    >> $@
+	@echo "    },"                              >> $@
+
+COMPDB_ENTRIES = $(addsuffix .compdb_entry, $(basename $(SOURCES)))
+
+compile_commands.json: $(COMPDB_ENTRIES)
+	@echo "[" > $@.tmp
+	@cat $^ >> $@.tmp
+	@sed '$$d' < $@.tmp > $@
+	@echo "    }" >> $@
+	@echo "]" >> $@
+	@rm $@.tmp
+
+clang-tidy: compile_commands.json
+	run-clang-tidy.py
+
+cppcheck: compile_commands.json
+	cppcheck --enable=all --inconclusive --std=c99 -I$(ERTS_INCLUDE_DIR) -I$(ERL_INTERFACE_INCLUDE_DIR) --project=$(CURDIR)/compile_commands.json --template=gcc --check-config -v -DHAVE_CONFIG=0
