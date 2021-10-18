@@ -44,6 +44,9 @@ static const felem_bytearray nistp256_curve_params[5] = {
 };
 /* clang-format on */
 
+/* The size of a tagged, uncompressed 256-bit ECC point */
+static const size_t kUncompressedPoint256 = 1 + 32 + 32;
+
 static ERL_NIF_TERM atom_undefined;
 static ERL_NIF_TERM atom_enomem;
 static ERL_NIF_TERM atom_enotsup;
@@ -62,7 +65,7 @@ mk_atom(ErlNifEnv * env, const char * atom)
 }
 
 static ERL_NIF_TERM
-recover(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
+recover_compact(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
 {
     if (argc != 1)
     {
@@ -288,7 +291,63 @@ out_err:
     return ret;
 }
 
-static ErlNifFunc nif_funcs[] = {{"is_compact_nif", 1, is_compact, 0}, {"recover_nif", 1, recover, 0}};
+static ERL_NIF_TERM
+recover_compressed(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
+{
+    EC_GROUP *      secp256k1;
+    EC_POINT *      point;
+    ErlNifBinary    bin;
+    ERL_NIF_TERM    ret;
+
+    if (argc != 1)
+    {
+        return enif_make_badarg(env);
+    }
+
+    secp256k1 = EC_GROUP_new_by_curve_name(NID_secp256k1);
+
+    if (secp256k1 == NULL)
+    {
+        ret = enif_raise_exception(env, atom_enomem);
+        goto CantAllocGroup;
+    }
+
+    if (term2point(env, argv[0], secp256k1, &point) != 1)
+    {
+        ret = enif_raise_exception(env, atom_enotsup);
+        goto CantUncompressPoint;
+    }
+
+    if (!enif_alloc_binary(kUncompressedPoint256, &bin))
+    {
+        ret = enif_raise_exception(env, atom_enomem);
+        goto CantAllocResult;
+    }
+
+    if (EC_POINT_point2oct(secp256k1, point, POINT_CONVERSION_UNCOMPRESSED, bin.data, kUncompressedPoint256, NULL) != kUncompressedPoint256)
+    {
+        enif_release_binary(&bin);
+        ret = enif_raise_exception(env, atom_enotsup);
+        goto CantFillResult;
+    }
+
+    ret = enif_make_binary(env, &bin);
+
+CantFillResult:
+CantAllocResult:
+    EC_POINT_free(point);
+CantUncompressPoint:
+    EC_GROUP_free(secp256k1);
+CantAllocGroup:
+
+    return ret;
+}
+
+static ErlNifFunc nif_funcs[] = {
+    {"is_compact_nif", 1, is_compact, 0},
+    {"recover_compact_nif", 1, recover_compact, 0},
+    {"recover_compressed_nif", 1, recover_compressed, 0}
+};
 
 static int
 load(ErlNifEnv * env, void ** priv_data, ERL_NIF_TERM load_info)
